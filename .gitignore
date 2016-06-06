@@ -1,0 +1,4 @@
+venv/*
+.idea/*
+project/settings_local.py
+db.sqlite3
