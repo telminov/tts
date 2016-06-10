@@ -1,15 +1,18 @@
-from django.shortcuts import render
-
 # Create your views here.
-from core.models import SomeModel
-from core.serializers import SomeModelSerializer
+import subprocess
+import os
+
 from django.http import Http404, JsonResponse
+from django.http import HttpResponse
+from django.conf import settings
+from django.core.files import File
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-
-
+from core.models import SomeModel, Wav
+from core.serializers import SomeModelSerializer
 
 class SomeModelList(APIView):
     """Список объектов SomeModel
@@ -27,8 +30,6 @@ class SomeModelList(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 class SomeModelDetail(APIView):
     """
@@ -57,3 +58,27 @@ class SomeModelDetail(APIView):
         snippet = self.get_object(pk)
         snippet.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+def generate_speach(request, text):
+    wav = Wav(text=text)
+    file_out = '%s.wav' % wav.uuid
+    command = 'echo %s | RHVoice-test -p irina -o %s' % (text, file_out)
+    wav.command = command
+    status, output = subprocess.getstatusoutput(command)
+    path_to_file = os.path.join(settings.BASE_DIR, file_out)
+    f = open(path_to_file, "rb")
+    wav.file = File(f)
+    wav.save()
+    return JsonResponse({'status': status, 'output': output, 'uuid': wav.uuid})
+
+def play_speach(request, uuid):
+    wavs = Wav.objects.filter(uuid=uuid)
+    if wavs:
+        f = wavs.first().file
+        response = HttpResponse()
+        response.write(f.file.read())
+        response['Content-Type'] = 'audio/mp3'
+        response['Content-Length'] = os.path.getsize(f.path)
+        return response
+    else:
+        raise Http404(u'Нет такого файла')
