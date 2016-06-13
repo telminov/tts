@@ -1,6 +1,10 @@
-from django.db import models
+# -*- encoding: utf-8
 import uuid
-# Create your models here.
+
+from django.db import models
+from django.conf import settings
+
+
 class SomeModel(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
@@ -10,7 +14,7 @@ class SomeModel(models.Model):
 class Wav(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=255, blank=True)
-    file = models.FileField(verbose_name=u'Файл', upload_to='generated_wav')
+    file = models.FileField(verbose_name=u'Файл', upload_to=settings.WAV_STORAGE_DIR)
     text = models.TextField(verbose_name=u'Фраза', blank=False)
     config = models.CharField(max_length=255, blank=True)
     command = models.CharField(max_length=255, blank=True)
