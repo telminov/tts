@@ -19,14 +19,11 @@ RUN apt-get update &&\
     apt-get install -y python3-pip git nginx scons gcc libpulse-dev libao-dev portaudio19-dev
 
 # install RHVoice
-WORKDIR /opt
-RUN git clone https://github.com/Olga-Yakovleva/RHVoice.git
-
+RUN git clone https://github.com/Olga-Yakovleva/RHVoice.git /opt/RHVoice
 WORKDIR /opt/RHVoice
 RUN scons && scons install && ldconfig
 
 # copy source and install requirements
-
 COPY . /opt/voice-synthesizer
 WORKDIR /opt/voice-synthesizer
 RUN cp conf/nginx.conf /etc/nginx/sites-enabled/voice-synthesizer
@@ -34,7 +31,7 @@ RUN rm /etc/nginx/sites-enabled/default
 RUN pip3 install -r requirements.txt
 
 # Starting the server
-CMD test "$(ls /conf/settings_local.py)" || cp conf/sample.settings_local.py /conf/settings_local.py;\
+CMD test "$(ls /conf/settings_local.py)" || cp /opt/voice-synthesizer/conf/sample.settings_local.py /conf/settings_local.py;\
     ln -s /conf/settings_local.py project/settings_local.py;\
     service nginx restart;\
     python3 ./manage.py collectstatic --noinput;\
