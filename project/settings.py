@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_swagger',
+    'gunicorn',
     'core',
 ]
 
@@ -158,10 +159,8 @@ SWAGGER_SETTINGS = {
     'doc_expansion': 'none',
 }
 
-
-
 try:
-   from project.settings_local import *
+    from project.settings_local import *
 except ImportError:
     print('Warning: no settings_local.py')
 

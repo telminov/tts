@@ -17,6 +17,7 @@ from rest_framework import status
 from core.models import SomeModel, Wav
 from core.serializers import SomeModelSerializer
 
+
 class SomeModelList(APIView):
     """Список объектов SomeModel.
         This text is the description for this API
@@ -93,7 +94,7 @@ def generate_speach(request):
         return Response({'output': 'Already generated', 'uuid': wav.uuid})
     wav = Wav(text=text)
     file_out = '%s/%s.wav' % (settings.WAV_TMP_DIR, wav.uuid)
-    command = 'echo %s | RHVoice-test -p irina -o %s' % (text, file_out)
+    command = 'echo %s | RHVoice-test -p elena -o %s' % (text, file_out)
     wav.command = command
     status, output = subprocess.getstatusoutput(command)
     path_to_generated_file = os.path.join(settings.BASE_DIR, file_out)
@@ -103,8 +104,9 @@ def generate_speach(request):
     status, output = subprocess.getstatusoutput('rm %s' % path_to_generated_file)
     return Response({'status': status, 'output': output, 'uuid': wav.uuid})
 
+
 @api_view()
-def play_speach(request):
+def play_speech(request):
     """Получение wav файла по uuid
     ---
     parameters:
@@ -114,19 +116,26 @@ def play_speach(request):
       type: text
       paramType: query
     """
+
     uuid_text = request.GET.get('uuid')
+
     try:
         uuid_ = uuid.UUID(uuid_text)
     except ValueError:
-        return Response({'status': 'error', 'message': '%s - Not correct uuid4 format'% uuid_text})
+        return Response({'status': 'error', 'message': '%s - Not correct uuid4 format' % uuid_text})
 
-    wavs = Wav.objects.filter(uuid=uuid_)
-    if wavs:
-        f = wavs.first().file
+    try:
+        wavs = Wav.objects.get(uuid=uuid_)
+
+        f = wavs.file
+
         response = HttpResponse()
         response.write(f.file.read())
-        response['Content-Type'] = 'audio/mp3'
-        response['Content-Length'] = os.path.getsize(f.path)
+
+        response['Content-Type'] = 'audio/vnd.wave'
+        response['Content-Length'] = f.size
+        response['Content-Disposition'] = 'attachment; filename=%s' % f.name.split('/')[-1]
+
         return response
-    else:
-        raise Http404(u'Нет такого файла')
+    except Wav.DoesNotExist:
+        raise Http404
