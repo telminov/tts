@@ -26,13 +26,15 @@ RUN scons && scons install && ldconfig
 # copy source and install requirements
 COPY . /opt/voice-synthesizer
 WORKDIR /opt/voice-synthesizer
-RUN cp conf/nginx.conf /etc/nginx/sites-enabled/voice-synthesizer
+COPY conf/nginx.conf /etc/nginx/sites-enabled/voice-synthesizer
 RUN rm /etc/nginx/sites-enabled/default
 RUN pip3 install -r requirements.txt
 
 # Starting the server
 CMD test "$(ls /conf/settings_local.py)" || cp /opt/voice-synthesizer/conf/sample.settings_local.py /conf/settings_local.py;\
+    test "$(ls wavs_tmp/)" || mkdir wavs_tmp;\
     ln -s /conf/settings_local.py project/settings_local.py;\
     service nginx restart;\
+    python3 ./manage.py migrate;\
     python3 ./manage.py collectstatic --noinput;\
     gunicorn project.wsgi --bind=127.0.0.1:8000 --workers=5

@@ -8,74 +8,14 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.core.files import File
 
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from rest_framework import viewsets
-from rest_framework import status
 
-from core.models import SomeModel, Wav
-from core.serializers import SomeModelSerializer
+from core.models import Wav
 
-
-class SomeModelList(APIView):
-    """Список объектов SomeModel.
-        This text is the description for this API
-        param1 -- A first parameter
-        param2 -- A second parameter
-    """
-    def get(self, request, format=None):
-        some_models = SomeModel.objects.all()
-        serializer = SomeModelSerializer(some_models, many=True)
-        return Response(serializer.data)
-
-
-    def post(self, request, format=None):
-        """Создает объектов SomeModel"""
-        serializer = SomeModelSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class SomeModelDetail(APIView):
-    """
-    Retrieve, update or delete a snippet instance.
-    """
-    def get_object(self, pk):
-        try:
-            return SomeModel.objects.get(pk=pk)
-        except SomeModel.DoesNotExist:
-            raise Http404
-
-    def get(self, request, pk, format=None):
-        some_model = self.get_object(pk)
-        serializer = SomeModelSerializer(some_model)
-        return Response(serializer.data)
-
-    def put(self, request, pk, format=None):
-        snippet = self.get_object(pk)
-        serializer = SomeModelSerializer(snippet, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk, format=None):
-        snippet = self.get_object(pk)
-        snippet.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-class SomeModelViewSet(viewsets.ModelViewSet):
-    """Вью СЕТ!
-
-    """
-    serializer_class = SomeModelSerializer
-    queryset = SomeModel.objects.all()
 
 @api_view(['post'])
-def generate_speach(request):
+def generate_speech(request):
     """Создание wav файла с переданным текстом
     ---
     parameters:
@@ -87,11 +27,12 @@ def generate_speach(request):
     """
     text = request.POST.get('text')
     if not text:
-        return Response({'status': 'error','output': u'No text parameter'})
+        return JsonResponse({'status': 'error', 'output': u'No text parameter'})
 
-    if Wav.objects.filter(text=text):
+    if Wav.objects.filter(text=text).exists():
         wav = Wav.objects.filter(text=text).first()
-        return Response({'output': 'Already generated', 'uuid': wav.uuid})
+        return JsonResponse({'output': 'Already generated', 'uuid': wav.uuid})
+
     wav = Wav(text=text)
     file_out = '%s/%s.wav' % (settings.WAV_TMP_DIR, wav.uuid)
     command = 'echo %s | RHVoice-test -p elena -o %s' % (text, file_out)
@@ -102,7 +43,8 @@ def generate_speach(request):
     wav.file = File(f)
     wav.save()
     status, output = subprocess.getstatusoutput('rm %s' % path_to_generated_file)
-    return Response({'status': status, 'output': output, 'uuid': wav.uuid})
+
+    return JsonResponse({'status': status, 'output': output, 'uuid': wav.uuid})
 
 
 @api_view()
