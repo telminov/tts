@@ -5,5 +5,6 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^docs/', include('rest_framework_swagger.urls', namespace='docs')),
     url(r'^', include('core.urls', namespace='Core'))
 ]

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from core.models import Wav
+from core import models
 
 # Register your models here.
-admin.site.register(Wav)
+admin.site.register(models.SoundFile)

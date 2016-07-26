@@ -19,7 +19,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
-
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = '123'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -38,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_swagger',
+    'django_cleanup',
     'gunicorn',
     'core',
 ]
@@ -123,45 +125,23 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+ADMIN_SITE_HEADER = 'Voice Synthesizer'
 SWAGGER_SETTINGS = {
-    'exclude_namespaces': ['example',],
-    'api_version': '0.1',
-    'api_path': '/',
-    'enabled_methods': [
-        'get',
-        'post',
-        'put',
-        'patch',
-        'delete'
-    ],
-    'api_key': '',
-    'is_authenticated': False,
-    'is_superuser': False,
-    'unauthenticated_user': 'django.contrib.auth.models.AnonymousUser',
-    'permission_denied_handler': None,
-    'resource_access_handler': None,
-    'base_path':'127.0.0.1:8000/docs',
     'info': {
-        'contact': 'apiteam@wordnik.com',
-        'description': 'This is a sample server Petstore server. '
-                       'You can find out more about Swagger at '
-                       '<a href="http://swagger.wordnik.com">'
-                       'http://swagger.wordnik.com</a> '
-                       'or on irc.freenode.net, #swagger. '
-                       'For this sample, you can use the api key '
-                       '"special-key" to test '
-                       'the authorization filters',
-        'license': 'Apache 2.0',
-        'licenseUrl': 'http://www.apache.org/licenses/LICENSE-2.0.html',
-        'termsOfServiceUrl': 'http://helloreverb.com/terms/',
-        'title': 'Swagger Sample App',
+        'contact': 'telminov@soft-way.biz',
+        'description': 'Service of TTS',
+        'title': ADMIN_SITE_HEADER,
     },
-    'doc_expansion': 'none',
 }
 
+STATIC_ROOT = '/static/'
+
+OUTPUT_DIR = os.path.join(BASE_DIR, 'generated')
+MAX_SOUND_LIFE = 60*60*12   # seconds of sound file storing
+
 try:
-    from project.settings_local import *
+    from project.local_settings import *
 except ImportError:
-    print('Warning: no settings_local.py')
+    print('Warning: no local_settings.py')
 
 
