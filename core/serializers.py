@@ -8,7 +8,7 @@ class Generation(serializers.Serializer):
 
 
 class GetFile(serializers.Serializer):
-    uuid = serializers.CharField(required=True)
+    uuid = serializers.UUIDField(required=True)
 
     def validate_uuid(self, value):
         if not models.SoundFile.objects.filter(uuid=value).exists():

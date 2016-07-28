@@ -36,7 +36,7 @@ RUN pip3 install -r requirements.txt
 # Starting the server
 CMD test "$(ls /conf/settings_local.py)" || cp /opt/voice-synthesizer/project/local_settings.sample.py /conf/settings_local.py;\
     ln -s /conf/settings_local.py project/settings_local.py;\
-    rm generated; ln -s /output generated;\
+    rm -rf generated; ln -s /output generated;\
     service nginx restart;\
     python3 ./manage.py migrate;\
     python3 ./manage.py collectstatic --noinput;\
