@@ -1,5 +1,5 @@
-# docker build -t bm0/voice-synthesizer .
-# docker push bm0/voice-synthesizer
+# docker build -t bm0computer/voice-synthesizer .
+# docker push bm0computer/voice-synthesizer
 # docker run -ti --rm --name voice -v /var/docker/voice/data/:/data/ -v /var/docker/voice/conf/:/conf/ -v /var/docker/voice/output/:/output -p 8000:80 bm0/voice-synthesizer
 FROM ubuntu:16.04
 MAINTAINER bm0 <bm0@soft-way.biz>
