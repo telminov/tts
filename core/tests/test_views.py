@@ -1,15 +1,19 @@
+# coding: utf-8
+import os
+import json
+import shutil
+
 from rest_framework.test import APITestCase
 from rest_framework import status
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
-import os
-import json
-import shutil
-
 
 class TestGenerateView(APITestCase):
     url = reverse('Core:generate')
+
+    def tearDown(self):
+        shutil.rmtree(settings.OUTPUT_DIR)
 
     def test_generate(self):
         response = self.client.post(self.url, {'text': 'Awesome Text!'})
@@ -18,9 +22,6 @@ class TestGenerateView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(content['status'], 0)
         self.assertTrue(os.path.exists('%s/%s.wav' % (settings.OUTPUT_DIR, content['uuid'])))
-
-    def tearDown(self):
-        shutil.rmtree(settings.OUTPUT_DIR)
 
 
 class TestGetFileView(APITestCase):
@@ -35,4 +36,3 @@ class TestGetFileView(APITestCase):
 
         self.assertEqual(get_response.status_code, status.HTTP_200_OK)
         self.assertEqual(get_response['Content-Disposition'], 'attachment; filename=%s.wav' % gen_content['uuid'])
-        # TODO Пока неясно, как проверить наличие файла в response'е
