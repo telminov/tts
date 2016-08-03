@@ -18,7 +18,7 @@ VOLUME /static
 
 # install dependencies
 RUN apt-get update &&\
-    apt-get install -y python3-pip git nginx scons gcc libpulse-dev libao-dev portaudio19-dev vim supervisor
+    apt-get install -y python3-pip git nginx vim supervisor scons gcc libao4 libao-dev pkg-config
 
 # install RHVoice
 RUN git clone https://github.com/Olga-Yakovleva/RHVoice.git /opt/RHVoice
@@ -35,6 +35,8 @@ RUN pip3 install -r requirements.txt
 
 # Starting the server
 CMD test "$(ls /conf/settings_local.py)" || cp /opt/voice-synthesizer/project/local_settings.sample.py /conf/settings_local.py;\
+    mv /usr/local/etc/RHVoice/RHVoice.conf /conf/RHVoice.conf;\
+    ln -s /conf/RHVoice.conf /usr/local/etc/RHVoice/RHVoice.conf;\
     ln -s /conf/settings_local.py project/settings_local.py;\
     rm -rf generated; ln -s /output generated;\
     service nginx restart;\
