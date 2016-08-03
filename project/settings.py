@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_swagger',
     'django_cleanup',
-    'gunicorn',
     'core',
 ]
 
@@ -140,7 +139,7 @@ OUTPUT_DIR = os.path.join(BASE_DIR, 'generated')
 MAX_SOUND_LIFE = 60*60*12   # seconds of sound file storing
 
 try:
-    from project.local_settings import *
+    from project.settings_local import *
 except ImportError:
     print('Warning: no local_settings.py')
 
