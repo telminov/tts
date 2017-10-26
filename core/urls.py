@@ -1,8 +1,9 @@
 from django.conf.urls import url
-import core.views
+from core import views
 
+app_name = 'core'
 urlpatterns = [
-    url(r'^$', core.views.index),
-    url(r'^generate/$', core.views.generate, name='generate'),
-    url(r'^get_file/$', core.views.get_file, name='get_file'),
+    url(r'^$', views.Index.as_view(), name='index'),
+    url(r'^generate/$', views.Generate.as_view(), name='generate'),
+    # url(r'^get_file/$', core.views.get_file, name='get_file'),
 ]

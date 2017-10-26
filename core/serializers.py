@@ -3,14 +3,21 @@ from rest_framework import serializers
 from . import models
 
 
-class Generation(serializers.Serializer):
-    text = serializers.CharField(required=True)
+class Generate(serializers.Serializer):
+    VOICE_CHOICES = (
+        ('anna', 'Anna'),
+        ('elena', 'Elena'),
+        ('irina', 'Irina'),
+    )
+
+    voice = serializers.ChoiceField(choices=VOICE_CHOICES)
+    text = serializers.CharField()
 
 
-class GetFile(serializers.Serializer):
-    uuid = serializers.UUIDField(required=True)
+class Voice(serializers.Serializer):
+    uuid = serializers.UUIDField()
 
     def validate_uuid(self, value):
-        if not models.SoundFile.objects.filter(uuid=value).exists():
-            raise serializers.ValidationError('Sound file with uuid "%s" not found' % value)
+        if not models.Voice.objects.filter(uuid=value).exists():
+            raise serializers.ValidationError('File with id {} not found.'.format(value))
         return value

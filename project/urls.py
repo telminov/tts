@@ -1,10 +1,9 @@
+from rest_framework.documentation import include_docs_urls
 from django.conf.urls import url, include
 from django.contrib import admin
 
-# UUID_REGEXP = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
-
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^docs/', include('rest_framework_swagger.urls', namespace='docs')),
-    url(r'^', include('core.urls', namespace='Core'))
+    url(r'^docs/', include_docs_urls(title='TTS API')),
+    url(r'^', include('core.urls', namespace='core'))
 ]
