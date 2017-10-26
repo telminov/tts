@@ -5,5 +5,5 @@ app_name = 'core'
 urlpatterns = [
     url(r'^$', views.Index.as_view(), name='index'),
     url(r'^generate/$', views.Generate.as_view(), name='generate'),
-    # url(r'^get_file/$', core.views.get_file, name='get_file'),
+    url(r'^voice/(?P<uuid>[^/]+)/$', views.GetVoice.as_view(), name='voice'),
 ]

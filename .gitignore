@@ -3,5 +3,3 @@ virt_env/*
 .idea/*
 project/local_settings.py
 db.sqlite3
-generated_wav/*
-wavs_tmp/*
