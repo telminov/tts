@@ -33,8 +33,8 @@ class Generate(ResponseSerializerMixin, generics.CreateAPIView):
         return response
 
 
-class GetVoice(generics.RetrieveAPIView):
-    queryset = models.Voice.objects.all()
+class Speech(generics.RetrieveAPIView):
+    queryset = models.Speech.objects.all()
     lookup_field = 'uuid'
 
     def retrieve(self, request, *args, **kwargs):

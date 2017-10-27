@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+import datetime
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -117,13 +118,15 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 OUTPUT_DIR = 'records'
-TEMP_DIR = os.path.join(MEDIA_ROOT, 'temp')
 
-SPEECH_TTL = 60 * 60 * 12
+SPEECH_TTL = datetime.timedelta(minutes=72)
+
+# Set permissions for the generated files so that Nginx can distribute them
+FILE_UPLOAD_PERMISSIONS = 0o775
 
 try:
     from project.settings_local import *

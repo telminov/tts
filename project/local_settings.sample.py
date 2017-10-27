@@ -12,4 +12,6 @@ DATABASES = {
     }
 }
 
+MEDIA_ROOT = '/media/'
+
 ALLOWED_HOSTS = ['*']

@@ -12,7 +12,7 @@ class Generate(serializers.ModelSerializer):
     voice = serializers.ChoiceField(choices=consts.VOICE_CHOICES, default='anna')
 
     class Meta:
-        model = models.Voice
+        model = models.Speech
         fields = ('text', 'voice')
 
     def create(self, validated_data):
@@ -29,12 +29,12 @@ class Generate(serializers.ModelSerializer):
 
             instance = None
             if echo.wait() == 0 and rhvoice.wait() == 0:
-                instance = models.Voice.objects.create(text=text, file=temp)
+                instance = models.Speech.objects.create(text=text, file=temp)
 
         return rhvoice.returncode, instance
 
 
 class Voice(serializers.ModelSerializer):
     class Meta:
-        model = models.Voice
+        model = models.Speech
         fields = ('uuid', 'file')
