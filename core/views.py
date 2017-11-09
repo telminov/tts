@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework import generics
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from django.urls import reverse_lazy
 from django.views.generic import RedirectView
@@ -15,6 +16,7 @@ class Index(RedirectView):
 
 
 class Generate(ResponseSerializerMixin, generics.CreateAPIView):
+    permission_classes = (IsAuthenticated, )
     serializer_class = serializers.Generate
     response_serializer_class = serializers.Voice
 
@@ -34,6 +36,7 @@ class Generate(ResponseSerializerMixin, generics.CreateAPIView):
 
 
 class Speech(generics.RetrieveAPIView):
+    permission_classes = (IsAuthenticated,)
     queryset = models.Speech.objects.all()
     lookup_field = 'uuid'
 
