@@ -1,16 +1,40 @@
-# coding: utf-8
+import subprocess
+
 from rest_framework import serializers
-from . import models
+from django.core.files.uploadedfile import TemporaryUploadedFile
+
+from core.datatools import string
+from core import consts
+from core import models
 
 
-class Generation(serializers.Serializer):
-    text = serializers.CharField(required=True)
+class Generate(serializers.ModelSerializer):
+    voice = serializers.ChoiceField(choices=consts.VOICE_CHOICES, default='anna')
+
+    class Meta:
+        model = models.Speech
+        fields = ('text', 'voice')
+
+    def create(self, validated_data):
+        text = validated_data['text']
+        voice = validated_data['voice']
+        filename = '{}.wav'.format(string.random_string(10))
+
+        with TemporaryUploadedFile(filename, None, None, None) as temp:
+            echo = subprocess.Popen(['echo', text], stdout=subprocess.PIPE)
+            rhvoice = subprocess.Popen(['RHVoice-test',
+                                        '-p', voice,
+                                        '-o', temp.temporary_file_path()],
+                                       stdin=echo.stdout, stdout=subprocess.PIPE)
+
+            instance = None
+            if echo.wait() == 0 and rhvoice.wait() == 0:
+                instance = models.Speech.objects.create(text=text, file=temp)
+
+        return rhvoice.returncode, instance
 
 
-class GetFile(serializers.Serializer):
-    uuid = serializers.UUIDField(required=True)
-
-    def validate_uuid(self, value):
-        if not models.SoundFile.objects.filter(uuid=value).exists():
-            raise serializers.ValidationError('Sound file with uuid "%s" not found' % value)
-        return value
+class Voice(serializers.ModelSerializer):
+    class Meta:
+        model = models.Speech
+        fields = ('uuid', 'file')
