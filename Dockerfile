@@ -1,6 +1,6 @@
 #docker run -ti --rm --name tts -p 8000:80 -v /var/docker/tts/static:/var/static -v /var/docker/tts/media:/media -v /var/docker/tts/conf:/conf -v /var/docker/tts/data:/data bm0/tts
 
-FROM ubuntu:17.10
+FROM ubuntu:16.04
 MAINTAINER bm0 <bm0@soft-way.biz>
 
 EXPOSE 80
@@ -36,7 +36,7 @@ RUN scons && scons install && ldconfig
 
 # cleanup
 RUN rm -rf /var/lib/{apt,dpkg,cache,log} &&\
-    rm -rf /opt/RHVoice &&\
+    rm -rf /tmp/RHVoice &&\
     apt-get clean auteclean &&\
     apt-get autoremove -y &&\
     apt-get purge -y\
@@ -57,4 +57,4 @@ RUN cp conf/supervisor.conf /etc/supervisor/conf.d/tts.conf &&\
 RUN rm /etc/nginx/sites-enabled/default
 RUN pip3 install -r requirements.txt
 
-CMD  ./bootstrap.sh
+ENTRYPOINT  ["sh", "./bootstrap.sh"]
